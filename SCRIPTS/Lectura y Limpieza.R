@@ -42,12 +42,12 @@ data <- data %>%
       plan == "Business" ~ 249,)
   )
 
-# Convertir la fecha expresada larga del ultimo mes de pago en otra columna solo de mes y años a fin de poder segmentar por meses y año en los reportes.
-
+# Tomar la fecha de pago para separarla en el mes y el año en columnas
 
 data <- data %>%
   mutate(
-    Fecha = format(ymd_hms(Ultimo_Pago), "%Y-%m")
+    Año = year(ymd_hms(Ultimo_Pago)),
+    Mes  = toupper(format(ymd_hms(Ultimo_Pago), "%B"))
   )
 
 #Convertir los codigos de los Paises en el nombre del pais.
@@ -117,10 +117,10 @@ data <- data %>%
       `Estado_Pago`== "trial" ~ "prueba",)
   )
  # Renombramos la columna de tarjetas y vemos que str
-str(data$Tarjetas_Activas)
+
 
 data <- data %>%
   rename(Tarjetas_Activas = `Cards count`)
 
-
+str(data$Tarjetas_Activas)
 # --------------- TERMINAMOS LIMPIEZA Y PREPARACCION---------------------------#
