@@ -50,6 +50,13 @@ data <- data %>%
     Mes  = toupper(format(ymd_hms(Ultimo_Pago), "%B"))
   )
 
+#Para facilitar el analisis vamos a modificar de la columna años los valores 2026,2027 y 2028 por 2025, debido a que son cuentas que
+#utilizan contratos diferentes y se les otorga vencimientos mas largos a fin de practicidad pero corresponden al año corriente
+# y se controla su pago mes a mes, si se da de baja se registra por lo que corresponden al 2025.
+
+data$Año[data$Año %in% c(2026, 2027, 2028)] <- 2025
+
+
 #Convertir los codigos de los Paises en el nombre del pais.
 
 # Leo cuantos codigos distintos tengo
@@ -123,6 +130,9 @@ data <- data %>%
   rename(Tarjetas_Activas = `Cards count`)
 
 str(data$Tarjetas_Activas)
+
+
+
 # --------------- TERMINAMOS LIMPIEZA Y PREPARACCION---------------------------#
 
 # Guardo el archivo limpio con oto nombre para dsp mandar a shiny
