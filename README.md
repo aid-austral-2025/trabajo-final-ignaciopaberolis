@@ -28,6 +28,3 @@ en el futuro.
 
 La base de datos es un (.xlsx) que se descargo directamente desde la plataforma de la startup.
 
-
-
-PRUEBAAAA
