@@ -124,3 +124,9 @@ data <- data %>%
 
 str(data$Tarjetas_Activas)
 # --------------- TERMINAMOS LIMPIEZA Y PREPARACCION---------------------------#
+
+# Guardo el archivo limpio con oto nombre para dsp mandar a shiny
+
+write.csv(data, "Shiny/data_limpio.csv", row.names = FALSE)
+
+
