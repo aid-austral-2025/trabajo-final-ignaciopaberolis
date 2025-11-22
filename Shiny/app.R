@@ -43,127 +43,116 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Planes", tabName = "planes", icon = icon("layer-group")),
       menuItem("Países", tabName = "paises", icon = icon("globe")),
-      menuItem("Tarjetas", tabName = "tarjetas", icon = icon("id-card"))
-    )
+      menuItem("Tarjetas", tabName = "tarjetas", icon = icon("id-card")),
+      menuItem("Ingresos", tabName = "ingresos", icon = icon("dollar-sign"))
+      )
   ),
   
   dashboardBody(
     tabItems(
       
-      # -------------------- PLANES ------------------------------------------------------------------------------
+      # -------------------- PLANES --------------------------------
       tabItem(tabName = "planes",
               fluidRow(
                 box(width = 4, title = "Filtros", solidHeader = TRUE, 
                     
-                    numericInput(
-                      "Año",
-                      "Seleccioná Año:",
-                      min = min(datash$Año),
-                      max = max(datash$Año),
-                      value = 2025
-                    ),
+                    numericInput("Año", "Seleccioná Año:",
+                                 min = min(datash$Año),
+                                 max = max(datash$Año),
+                                 value = 2025),
                     
-                    pickerInput(
-                      inputId = "plan",
-                      label = "Seleccionar Plan(es):",
-                      choices = sort(unique(datash$plan)),
-                      multiple = TRUE,
-                      options = list(`actions-box` = TRUE),
-                      selected = unique(datash$plan)
-                    )
+                    pickerInput("plan", "Seleccionar Plan(es):",
+                                choices = sort(unique(datash$plan)),
+                                multiple = TRUE,
+                                options = list(`actions-box` = TRUE),
+                                selected = unique(datash$plan))
                 ),
-                
-                box(width = 8, title = "Cuentas por Plan", solidHeader = TRUE,
+                box(width = 8, title = "Cuentas por Plan",
                     plotlyOutput("GraficoPlanes"))
               )
       ),
       
-      # -------------------- PAISES -----------------------------------------------------------------------------
+      # -------------------- PAISES ------------------------------
       tabItem(tabName = "paises",
-              
               fluidRow(
                 box(width = 4, title = "Filtros", solidHeader = TRUE,
                     
-                    numericInput(
-                      "Año_pais",
-                      "Seleccioná Año:",
-                      min = min(datash$Año),
-                      max = max(datash$Año),
-                      value = 2025
-                    ),
+                    numericInput("Año_pais", "Seleccioná Año:",
+                                 min = min(datash$Año),
+                                 max = max(datash$Año),
+                                 value = 2025),
                     
-                    pickerInput(
-                      inputId = "paises",
-                      label = "Seleccionar País(es):",
-                      choices = sort(unique(datash$`Country code`)),
-                      multiple = TRUE,
-                      options = list(`actions-box` = TRUE),
-                      selected = unique(datash$`Country code`)
-                    )
+                    pickerInput("paises", "Seleccionar País(es):",
+                                choices = sort(unique(datash$`Country code`)),
+                                multiple = TRUE,
+                                options = list(`actions-box` = TRUE),
+                                selected = unique(datash$`Country code`))
                 ),
-                
-                box(width = 8, title = "Cuentas por País", solidHeader = TRUE,
+                box(width = 8, title = "Cuentas por País",
                     plotlyOutput("GraficoPaises"))
               )
       ),
       
-      # -------------------- TARJETAS ---------------------------------------------------------------------------------
+      # -------------------- TARJETAS ----------------------------
       tabItem(tabName = "tarjetas",
-              
               fluidRow(
                 box(width = 4, title = "Filtros", solidHeader = TRUE,
                     
-                    numericInput(
-                      "Año_tarjetas",
-                      "Seleccioná Año:",
-                      min = min(datash$Año),
-                      max = max(datash$Año),
-                      value = 2025
-                    ),
+                    numericInput("Año_tarjetas", "Seleccioná Año:",
+                                 min = min(datash$Año),
+                                 max = max(datash$Año),
+                                 value = 2025),
                     
-                    pickerInput(
-                      inputId = "planes_tarjeta",
-                      label = "Seleccionar Plan(es):",
-                      choices = sort(unique(datash$plan)),
-                      multiple = TRUE,
-                      options = list(`actions-box` = TRUE),
-                      selected = unique(datash$plan)
-                    )
+                    pickerInput("planes_tarjeta", "Seleccionar Plan(es):",
+                                choices = sort(unique(datash$plan)),
+                                multiple = TRUE,
+                                options = list(`actions-box` = TRUE),
+                                selected = unique(datash$plan))
                 ),
-                
-                box(width = 8, title = "Tarjetas Activas por Plan", solidHeader = TRUE,
+                box(width = 8, title = "Tarjetas Activas por Plan",
                     plotlyOutput("GraficoTarjetas"))
+              )
+      ),
+      
+      # -------------------- INGRESOS ----------------------------
+      tabItem(tabName = "ingresos",
+              fluidRow(
+                box(width = 4, title = "Filtros", solidHeader = TRUE,
+                    
+                    numericInput("Año_monto", "Seleccioná Año:",
+                                 min = min(datash$Año),
+                                 max = max(datash$Año),
+                                 value = 2025),
+                    
+                    pickerInput("planes_monto", "Seleccionar Plan(es):",
+                                choices = sort(unique(datash$plan)),
+                                multiple = TRUE,
+                                options = list(`actions-box` = TRUE),
+                                selected = unique(datash$plan))
+                ),
+                box(width = 8, title = "Monto total cobrado por Plan",
+                    plotlyOutput("GraficoMonto"))
               )
       )
     )
   )
 )
-
 #--------------------SERVIDOR ---------------------------------------------------------------------------------------------------
 
 server <- function(input, output) {
   
-  # ---- GRAFICO DE PLANES -----------------------------------------------------------------------------
+  # ---- GRAFICO DE PLANES ----
   output$GraficoPlanes <- renderPlotly({
-    
-    df <- datash %>%
-      filter(
-        Año == input$Año,
-        plan %in% input$plan
-      ) %>%
+    df <- datash %>% 
+      filter(Año == input$Año,
+             plan %in% input$plan) %>%
       count(Mes, plan)
     
     g <- df %>%
-      ggplot(aes(x = Mes, y = n, color = plan, group = plan)) +
+      ggplot(aes(Mes, n, color = plan)) +
       geom_line(linewidth = 1.3) +
       geom_point(size = 2) +
-      labs(
-        title = paste("Evolución mensual por plan en", input$Año),
-        x = "Mes",
-        y = "Cantidad"
-      ) +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme_minimal()
     
     ggplotly(g)
   })
@@ -176,37 +165,49 @@ server <- function(input, output) {
       count(`Country code`)
     
     g <- df %>%
-      ggplot(aes(x = reorder(`Country code`, n), y = n, fill = `Country code`)) +
+      ggplot(aes(reorder(`Country code`, n), n, fill = `Country code`)) +
       geom_col() +
       coord_flip() +
       theme_minimal()
     
     ggplotly(g)
   })
+  
   # ---- GRAFICO DE TARJETAS ----
   output$GraficoTarjetas <- renderPlotly({
     
     df <- datash %>%
-      filter(
-        Año == input$Año_tarjetas,
-        plan %in% input$planes_tarjeta
-      ) %>%
+      filter(Año == input$Año_tarjetas,
+             plan %in% input$planes_tarjeta) %>%
       group_by(plan) %>%
       summarise(Tarjetas = sum(Tarjetas_Activas, na.rm = TRUE))
     
-    g <- df %>%
-      ggplot(aes(x = plan, y = Tarjetas, fill = plan)) +
+    g <- df %>% 
+      ggplot(aes(plan, Tarjetas, fill = plan)) +
       geom_col() +
-      labs(
-        title = paste("Tarjetas activas por plan en", input$Año_tarjetas),
-        x = "Plan",
-        y = "Total de Tarjetas Activas"
-      ) +
       theme_minimal()
     
     ggplotly(g)
   })
+  
+  # ---- GRAFICO DE INGRESOS ----
+  output$GraficoMonto <- renderPlotly({
+    
+    df <- datash %>%
+      filter(Año == input$Año_monto,
+             Estado_Pago == "Pago",
+             plan %in% input$planes_monto) %>%
+      group_by(plan) %>%
+      summarise(Monto = sum(importe_plan, na.rm = TRUE))
+    
+    g <- df %>%
+      ggplot(aes(plan, Monto, fill = plan)) +
+      geom_col() +
+      theme_minimal()
+    
+    ggplotly(g)
+  })
+  
 }
-
 #--------------Corremos La APP---------------------
 shinyApp(ui, server)
