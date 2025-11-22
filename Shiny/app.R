@@ -132,30 +132,37 @@ ui <- dashboardPage(
                 ),
                 box(width = 8, title = "Monto total cobrado por Plan",
                     plotlyOutput("GraficoMonto"))
-              )
+              ),
+              
+          
+              fluidRow(
+                valueBoxOutput("kpiMontoTotal")
+             )
       )
-    )
-  )
-)
+    )  
+  )    
+)  
 #--------------------SERVIDOR ---------------------------------------------------------------------------------------------------
 
 server <- function(input, output) {
   
-  # ---- GRAFICO DE PLANES ----
   output$GraficoPlanes <- renderPlotly({
+    
     df <- datash %>% 
       filter(Año == input$Año,
              plan %in% input$plan) %>%
-      count(Mes, plan)
+      count(Mes, plan) %>%
+      mutate(Mes = factor(Mes, levels = meses_es, ordered = TRUE))
     
     g <- df %>%
-      ggplot(aes(Mes, n, color = plan)) +
-      geom_line(linewidth = 1.3) +
-      geom_point(size = 2) +
-      theme_minimal()
+      ggplot(aes(x = Mes, y = n, fill = plan)) +
+      geom_col(position = "stack") +
+      theme_minimal() +
+      labs(x = "Mes", y = "Cantidad", fill = "Plan")
     
     ggplotly(g)
   })
+  
   
   # ---- GRAFICO DE PAISES ----
   output$GraficoPaises <- renderPlotly({
@@ -208,6 +215,24 @@ server <- function(input, output) {
     ggplotly(g)
   })
   
-}
+  # ---- INDICAR INGRESOS EN USD$ ----
+  
+  output$kpiMontoTotal <- renderValueBox({
+    
+    total_monto <- datash %>% 
+      filter(Año == input$Año_monto,
+             Estado_Pago == "Pago",
+             plan %in% input$planes_monto) %>%
+      summarise(total = sum(importe_plan, na.rm = TRUE)) %>%
+      pull(total)
+    
+    valueBox(
+      value = total_monto,
+      subtitle = "Ingreso total",
+      icon = icon("dollar-sign"),
+      color = "fuchsia"
+    )
+  })
+}  
 #--------------Corremos La APP---------------------
 shinyApp(ui, server)
