@@ -3,6 +3,7 @@
 
 
 ----------------------------  SELECCION BASE DE DATOS--------------------------------------
+1° Etapa:
 
 El presente proyecto se desarrollará a partir de la base de datos de la startup en la cual me desempeño como analista.
 
@@ -27,3 +28,8 @@ en el futuro.
 
 La base de datos es un (.xlsx) que se descargo directamente desde la plataforma de la startup.
 
+
+2°Etapa: Carga del data set, exploracion y limpieza para generacion de Shinny (Carpeta Scrips y Data Set)
+
+
+3° Creacion y lanzamiento de Shinny APP. (Carpeta Shiny)
